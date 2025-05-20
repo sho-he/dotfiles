@@ -81,3 +81,15 @@ alias dcl='docker compose exec web yarn lint --fix'
 alias dcr='docker compose exec web bundle exec rspec'
 alias eslint='yarn lint --fix'
 
+
+function aws-sso-login() {
+  export AWS_PROFILE="$1"
+  aws sso login --profile "$1"
+  aws sts get-caller-identity
+  if [ "$1" =~ root ]; then
+    export ENVIRONMENT=production
+  else
+    export ENVIRONMENT=sandbox
+  fi
+}
+
