@@ -84,5 +84,31 @@
   {
     "key": "shift+cmd+[Quote]",
     "command": "cline.openInNewTab"
+  },
+  {
+    "key": "cmd+n",
+    "command": "explorer.newFile"
+  },
+  {
+    "key": "cmd+n",
+    "command": "-workbench.action.files.newUntitledFile"
+  },
+  {
+    "key": "ctrl+cmd+n",
+    "command": "workbench.action.files.newUntitledFile"
+  },
+  {
+    "key": "ctrl+cmd+m",
+    "command": "explorer.newFolder"
+  },
+  {
+    "key": "shift+cmd+[Quote]",
+    "command": "cline.focusChatInput",
+    "when": "!editorHasSelection"
+  },
+  {
+    "key": "shift+cmd+7",
+    "command": "-cline.focusChatInput",
+    "when": "!editorHasSelection"
   }
 ]
