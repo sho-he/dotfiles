@@ -1,3 +1,7 @@
+for config_file in ~/.zsh/*.zsh; do
+  source "$config_file"
+done
+
 typeset -U path PATH
 path=(
   /opt/homebrew/bin(N-/)
@@ -9,7 +13,7 @@ path=(
   /usr/local/bin(N-/)
   /usr/local/sbin(N-/)
   /Library/Apple/usr/bin
-  /Users/sho-he/go/bin
+  ~/go/bin
 )
 
 # use reguler expression without escape
@@ -83,13 +87,47 @@ alias eslint='yarn lint --fix'
 
 
 function aws-sso-login() {
-  export AWS_PROFILE="$1"
-  aws sso login --profile "$1"
-  aws sts get-caller-identity
-  if [ "$1" =~ root ]; then
-    export ENVIRONMENT=production
-  else
-    export ENVIRONMENT=sandbox
+  # get aws profiles
+  local profiles=($(aws configure list-profiles))
+
+  if [[ ${#profiles[@]} -eq 0 ]]; then
+    echo "Cannot find profiles. Please exec 'aws configure'"
+    return 1
   fi
+  echo "Select Profile:"
+  select profile in "${profiles[@]}"; do
+    [[ -n "$profile" ]] && break
+    echo "Input valid number"
+  done
+
+  aws sso login --profile "$profile"
+  export AWS_PROFILE="$profile"
+  echo "AWS_PROFILE=$AWS_PROFILE"
+}
+
+function claude-set() {
+  # select Claude model
+  local models=(
+    "us.anthropic.claude-opus-4-20250514-v1:0" 
+    "anthropic.claude-sonnet-4-20250514-v1:0"
+    "anthropic.claude-3-5-sonnet-20240620-v1:0"
+    "anthropic.claude-3-5-sonnet-20241022-v2:0"
+  )
+
+  echo "Select model: "
+  select model in "${models[@]}"; do
+    [[ -n "$model" ]] && break
+    echo "input valid number"
+  done
+
+  export AWS_PROFILE="developer"
+  export ANTHROPIC_MODEL="$model"
+  export AWS_REGION=us-west-2
+  export CLAUDE_CODE_USE_BEDROCK=1
+  export CLAUDE_CODE_MAX_OUTPUT_TOKENS=4096
+
+  echo "AWS_PROFILE=$AWS_PROFILE"
+  echo "ANTHROPIC_MODEL=$ANTHROPIC_MODEL"
+  claude
 }
 
