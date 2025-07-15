@@ -71,10 +71,6 @@ export PATH="$VOLTA_HOME/bin:$PATH"
 alias d='docker'
 alias dc='docker compose'
 alias dce='docker compose exec'
-alias dct='docker compose exec web yarn test'
-alias dcl='docker compose exec web yarn lint --fix'
-alias dcr='docker compose exec web bundle exec rspec'
-alias eslint='yarn lint --fix'
 
 
 function claude-set() {
@@ -106,7 +102,7 @@ function claude-set() {
 # custom commands
 #
 # fbr - checkout git branch (including remote branches)
-fbr() {
+gco() {
   local branches branch
   branches=$(git branch --all | grep -v HEAD) &&
   branch=$(echo "$branches" |
