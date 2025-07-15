@@ -61,16 +61,7 @@ setopt PROMPT_SUBST ; PS1='%n@%m%f: %~%f $(__git_ps1 )%f\$ '
 
 eval "$(direnv hook zsh)"
 
-# set up git alias
-alias g='git'
-alias gst='git status'
-alias gd='git diff'
-alias gdc='git diff --cached'
-alias gl='git pull'
-alias gup='git pull --rebase'
-alias gp='git push'
-alias gd='git diff'
-alias gc='git checkout'
+# set up tool path
 export GOPATH=~/go
 export PATH="/opt/homebrew/opt/openssl@1.1/bin:$PATH"
 export VOLTA_HOME="$HOME/.volta"
@@ -85,25 +76,6 @@ alias dcl='docker compose exec web yarn lint --fix'
 alias dcr='docker compose exec web bundle exec rspec'
 alias eslint='yarn lint --fix'
 
-
-function aws-sso-login() {
-  # get aws profiles
-  local profiles=($(aws configure list-profiles))
-
-  if [[ ${#profiles[@]} -eq 0 ]]; then
-    echo "Cannot find profiles. Please exec 'aws configure'"
-    return 1
-  fi
-  echo "Select Profile:"
-  select profile in "${profiles[@]}"; do
-    [[ -n "$profile" ]] && break
-    echo "Input valid number"
-  done
-
-  aws sso login --profile "$profile"
-  export AWS_PROFILE="$profile"
-  echo "AWS_PROFILE=$AWS_PROFILE"
-}
 
 function claude-set() {
   # select Claude model
@@ -130,4 +102,28 @@ function claude-set() {
   echo "ANTHROPIC_MODEL=$ANTHROPIC_MODEL"
   claude
 }
+
+# custom commands
+#
+# fbr - checkout git branch (including remote branches)
+fbr() {
+  local branches branch
+  branches=$(git branch --all | grep -v HEAD) &&
+  branch=$(echo "$branches" |
+           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+# aws sso login command
+aws-sso-login() {
+  # get aws profiles
+  local profiles profile
+  profiles=$(aws configure list-profiles) &&
+  profile=$(echo "$profiles" |
+    fzf-tmux -d $(( 2 + $(wc -l <<< "$profiles") )) +m) &&
+  aws sso login --profile $(echo "$profile" | sed "s/.* //")  
+
+  echo "AWS_PROFILE=$profile"
+}
+
 
