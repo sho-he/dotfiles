@@ -16,6 +16,9 @@ path=(
   ~/go/bin
 )
 
+# set up mise
+eval "$(mise activate zsh)"
+
 # use reguler expression without escape
 setopt nonomatch
 
@@ -25,11 +28,11 @@ if type brew &>/dev/null; then
   autoload -Uz compinit && compinit
 fi
 
-eval "$(rbenv init - zsh)"
+# eval "$(rbenv init - zsh)"
 
-[[ -d ~/.rbenv  ]] && \
-  export PATH=${HOME}/.rbenv/bin:${PATH} && \
-  eval "$(rbenv init -)"
+# [[ -d ~/.rbenv  ]] && \
+#   export PATH=${HOME}/.rbenv/bin:${PATH} && \
+#   eval "$(rbenv init -)"
 
 # set up go
 export GOENV_ROOT="$HOME/.goenv"
@@ -106,7 +109,7 @@ gco() {
   local branches branch
   branches=$(git branch --all | grep -v HEAD) &&
   branch=$(echo "$branches" |
-           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+           fzf-tmux -p 60%,40% -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
   git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
 }
 
@@ -116,10 +119,11 @@ aws-sso-login() {
   local profiles profile
   profiles=$(aws configure list-profiles) &&
   profile=$(echo "$profiles" |
-    fzf-tmux -d $(( 2 + $(wc -l <<< "$profiles") )) +m) &&
+    fzf-tmux -p 60%,40% -d $(( 2 + $(wc -l <<< "$profiles") )) +m) &&
   aws sso login --profile $(echo "$profile" | sed "s/.* //")  
 
-  echo "AWS_PROFILE=$profile"
+  echo $profile
+  export "AWS_PROFILE=$profile"
 }
 
 
